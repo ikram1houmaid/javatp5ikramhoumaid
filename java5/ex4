@@ -1,0 +1,333 @@
+import java.util.Scanner;
+
+class Document {
+    private static int compteur = 0;
+    private int numEnreg;
+    private String titre;
+
+    public Document(String titre) {
+        this.numEnreg = ++compteur;
+        this.titre = titre;
+    }
+
+    public int getNumEnreg() {
+        return numEnreg;
+    }
+
+    public String getTitre() {
+        return titre;
+    }
+
+    @Override
+    public String toString() {
+        return "Document [numEnreg=" + numEnreg + ", titre=" + titre + "]";
+    }
+}
+
+class Livre extends Document {
+    private String auteur;
+    private int nbrPages;
+
+    public Livre(String titre, String auteur, int nbrPages) {
+        super(titre);
+        this.auteur = auteur;
+        this.nbrPages = nbrPages;
+    }
+
+    public String getAuteur() {
+        return auteur;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", auteur=" + auteur
+                + ", pages=" + nbrPages;
+    }
+}
+
+class Roman extends Livre {
+    private double prix;
+
+    public Roman(String titre, String auteur, int nbrPages, double prix) {
+        super(titre, auteur, nbrPages);
+        this.prix = prix;
+    }
+
+    @Override
+    public String toString() {
+        return "Roman [" + super.toString() + ", prix=" + prix + "]";
+    }
+}
+
+class Manuel extends Livre {
+    private String niveau;
+
+    public Manuel(String titre, String auteur, int nbrPages, String niveau) {
+        super(titre, auteur, nbrPages);
+        this.niveau = niveau;
+    }
+
+    @Override
+    public String toString() {
+        return "Manuel [" + super.toString() + ", niveau=" + niveau + "]";
+    }
+}
+
+class Revue extends Document {
+    private String mois;
+    private int annee;
+
+    public Revue(String titre, String mois, int annee) {
+        super(titre);
+        this.mois = mois;
+        this.annee = annee;
+    }
+
+    @Override
+    public String toString() {
+        return "Revue [" + super.toString() + ", mois=" + mois
+                + ", annee=" + annee + "]";
+    }
+}
+
+class Dictionnaire extends Document {
+    private String langue;
+
+    public Dictionnaire(String titre, String langue) {
+        super(titre);
+        this.langue = langue;
+    }
+
+    @Override
+    public String toString() {
+        return "Dictionnaire [" + super.toString()
+                + ", langue=" + langue + "]";
+    }
+}
+
+class Bibliotheque {
+    private int capacite;
+    private Document[] documents;
+    private int nbDocuments;
+
+    public Bibliotheque(int capacite) {
+        this.capacite = capacite;
+        documents = new Document[capacite];
+        nbDocuments = 0;
+    }
+
+    public void afficherDocuments() {
+        if (nbDocuments == 0) {
+            System.out.println("Aucun document.");
+            return;
+        }
+
+        for (int i = 0; i < nbDocuments; i++) {
+            System.out.println(documents[i]);
+        }
+    }
+
+    public boolean ajouter(Document doc) {
+        if (doc == null || nbDocuments >= capacite) {
+            return false;
+        }
+
+        documents[nbDocuments++] = doc;
+        return true;
+    }
+
+    public boolean supprimer(Document doc) {
+        for (int i = 0; i < nbDocuments; i++) {
+            if (documents[i] == doc) {
+                for (int j = i; j < nbDocuments - 1; j++) {
+                    documents[j] = documents[j + 1];
+                }
+
+                documents[--nbDocuments] = null;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Document document(int numEnreg) {
+        for (int i = 0; i < nbDocuments; i++) {
+            if (documents[i].getNumEnreg() == numEnreg) {
+                return documents[i];
+            }
+        }
+
+        return null;
+    }
+
+    public void afficherAuteurs() {
+        boolean trouve = false;
+
+        for (int i = 0; i < nbDocuments; i++) {
+            if (documents[i] instanceof Livre) {
+                Livre livre = (Livre) documents[i];
+                System.out.println(livre.getAuteur());
+                trouve = true;
+            }
+        }
+
+        if (!trouve) {
+            System.out.println("Aucun auteur.");
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int n;
+
+        do {
+            System.out.print("Capacite de la bibliotheque (minimum 2) : ");
+            n = sc.nextInt();
+        } while (n < 2);
+
+        sc.nextLine();
+
+        Bibliotheque b = new Bibliotheque(n);
+
+        b.ajouter(new Roman("Le Petit Prince", "Antoine de Saint-Exupery",
+                120, 80));
+        b.ajouter(new Revue("Science et Vie", "Octobre", 2026));
+
+        int choix;
+
+        do {
+            System.out.println("\n--- MENU BIBLIOTHEQUE ---");
+            System.out.println("1. Ajouter un document");
+            System.out.println("2. Afficher les documents");
+            System.out.println("3. Supprimer un document");
+            System.out.println("4. Rechercher un document");
+            System.out.println("5. Afficher les auteurs");
+            System.out.println("6. Quitter");
+            System.out.print("Votre choix : ");
+
+            choix = sc.nextInt();
+            sc.nextLine();
+
+            switch (choix) {
+                case 1:
+                    if (n == 0) {
+                        break;
+                    }
+
+                    System.out.println("1. Roman");
+                    System.out.println("2. Manuel");
+                    System.out.println("3. Revue");
+                    System.out.println("4. Dictionnaire");
+                    System.out.print("Type : ");
+
+                    int type = sc.nextInt();
+                    sc.nextLine();
+
+                    System.out.print("Titre : ");
+                    String titre = sc.nextLine();
+
+                    Document doc = null;
+
+                    if (type == 1) {
+                        System.out.print("Auteur : ");
+                        String auteur = sc.nextLine();
+                        System.out.print("Nombre de pages : ");
+                        int pages = sc.nextInt();
+                        System.out.print("Prix : ");
+                        double prix = sc.nextDouble();
+                        sc.nextLine();
+
+                        doc = new Roman(titre, auteur, pages, prix);
+
+                    } else if (type == 2) {
+                        System.out.print("Auteur : ");
+                        String auteur = sc.nextLine();
+                        System.out.print("Nombre de pages : ");
+                        int pages = sc.nextInt();
+                        sc.nextLine();
+                        System.out.print("Niveau : ");
+                        String niveau = sc.nextLine();
+
+                        doc = new Manuel(titre, auteur, pages, niveau);
+
+                    } else if (type == 3) {
+                        System.out.print("Mois : ");
+                        String mois = sc.nextLine();
+                        System.out.print("Annee : ");
+                        int annee = sc.nextInt();
+                        sc.nextLine();
+
+                        doc = new Revue(titre, mois, annee);
+
+                    } else if (type == 4) {
+                        System.out.print("Langue : ");
+                        String langue = sc.nextLine();
+
+                        doc = new Dictionnaire(titre, langue);
+                    }
+
+                    if (doc != null) {
+                        if (b.ajouter(doc)) {
+                            System.out.println("Document ajoute.");
+                        } else {
+                            System.out.println("Bibliotheque pleine.");
+                        }
+                    } else {
+                        System.out.println("Type invalide.");
+                    }
+                    break;
+
+                case 2:
+                    b.afficherDocuments();
+                    break;
+
+                case 3:
+                    System.out.print("Numero d'enregistrement : ");
+                    int numSup = sc.nextInt();
+                    sc.nextLine();
+
+                    Document aSupprimer = b.document(numSup);
+
+                    if (aSupprimer != null && b.supprimer(aSupprimer)) {
+                        System.out.println("Document supprime.");
+                    } else {
+                        System.out.println("Document introuvable.");
+                    }
+                    break;
+
+                case 4:
+                    System.out.print("Numero d'enregistrement : ");
+                    int num = sc.nextInt();
+                    sc.nextLine();
+
+                    Document recherche = b.document(num);
+
+                    if (recherche != null) {
+                        System.out.println(recherche);
+                    } else {
+                        System.out.println("Document introuvable.");
+                    }
+                    break;
+
+                case 5:
+                    b.afficherAuteurs();
+                    break;
+
+                case 6:
+                    System.out.println("Au revoir !");
+                    break;
+
+                default:
+                    System.out.println("Choix invalide.");
+            }
+
+        } while (choix != 6);
+
+        sc.close();
+    }
+}
+```
